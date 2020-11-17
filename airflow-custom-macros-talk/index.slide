@@ -1,0 +1,58 @@
+# Custom Airflow Macros
+17 Nov 2020
+Tags: airflow, cloud composer, jinja, jinja2
+Summary: A general overview of Jinja templating in Airflow, what you can do with custom macros, and how to build them.
+
+Sam Fonseca
+Software Engineer, The New York Times
+sam.fonseca@nytimes.com
+@samdfonseca
+
+
+## Overview
+
+- Jinja Templates
+- What are Airflow macros?
+- User Defined Macros
+- Examples
+
+
+## Jinja Templates
+
+- Variables and/or expressions get replaced with values when rendered, `{{ ... }}`
+- Statements control the template logic, `{% ... %}`
+
+.code code/template_example.sh
+
+
+## What are Airflow macros?
+
+- Used to pass dynamic information into task instances at runtime
+- Allow run-time tasks to be offloaded to the executor instead of the scheduler
+- Includes DAG execution variables, i.e. `DagRun`, `TaskInstance`, `execution_date`
+
+.code code/bigquery_weekend_example.py
+
+
+## User Defined Macros
+
+- Wrapping common template logic in a function helps avoid duplication
+
+.code code/bigquery_weekend_example2.py
+
+
+## User Defined Macros
+
+- Closures can be used to dynamically generate new macros
+
+.code code/bigquery_weekend_example3.py
+
+
+## Examples
+
+.code code/rerender_template_example.py
+
+
+## Examples
+
+.code code/adjust_scheduled_ds_example.py
