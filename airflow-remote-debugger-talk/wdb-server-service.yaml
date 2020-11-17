@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wdb-server-service
+  labels:
+    run: wdb-server
+spec:
+  selector:
+    run: wdb-server
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - port: 1984
+      protocol: TCP
+      targetPort: 1984
+      name: ui
+    - port: 19840
+      protocol: TCP
+      targetPort: 19840
+      name: socket

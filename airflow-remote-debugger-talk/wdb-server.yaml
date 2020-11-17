@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wdb-server
+  labels:
+    run: wdb-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: wdb-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: wdb-server
+    spec:
+      containers:
+        - name: wdb-server
+          image: kozea/wdb
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - localhost:1984

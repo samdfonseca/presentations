@@ -1,0 +1,82 @@
+Airflow Remote Debugging
+4 March 2020
+Tags: airflow, debugger, debugging, remote debugger, remote debugging, cloud composer
+
+Sam Fonseca
+Software Engineer, New York Times
+@samdfonseca
+sam.fonseca@nytimes.com
+
+
+* Overview
+
+- What are remote debuggers?
+- Benefits
+- Using a debugger with Airflow
+- When you might consider using one
+- Complications with Airflow
+- How to set one up (wdb)
+
+
+* What are remote debuggers?
+
+- Think *pdb* with a client-server architecture
+- Client connects to the server to initiate a debugging session
+- Server is responsible for managing debugging sessions and displaying the frontend
+- Client executes debugging instructions sent back to it from the server
+
+
+* Benefits
+
+- Can be used even when you don't control the execution, i.e. can't run
+  python -m pdb script.py
+- Pause the execution of a single *python* process
+- Inspect the state of the current frame
+- Step through code line by line
+- In-program python code execution
+- Set additional breakpoints
+
+
+* Using a debugger with Airflow
+
+Setting breakpoints
+
+- If `set_trace()` is called from parse-time code, the scheduler process will be halted
+- Unsure how this will behave but I'd bet it breaks _stuff_
+- Breakpoints should generally be set from task execution code
+- Subclass built-in operators to add a `set_trace()` call
+  class TempBigQueryOperator(BigQueryOperator):
+    def execute(self, context):
+      set_trace()
+      super().execute(context)
+
+
+* When you might consider using one
+
+- Custom operators, sensors, hooks, etc.
+- `PythonOperator` tasks
+- Built-in operators not behaving as expected
+- Task execution can be paused without breaking the rest of the DAG
+
+
+* Complications with Airflow
+
+- Tasks are executed as separate processes
+- Can't debug an entire DAG all at once (not easily at least)
+- Debugging session only covers the task instance it was initiated from
+- Starting a debugging session requires code modification, adding a `set_trace()` call
+- Worker nodes have to be able to connect to the machine running the server
+- Pausing task instances may cause race-conditions between tasks to go unnoticed
+
+
+* How to set one up (wdb)
+
+.image wdb.png 500 _
+.caption A [[https://github.com/Kozea/wdb][wdb]] debugging session
+
+
+* Wdb in kubernetes (server)
+
+- Two resources, a deployment and a service
+- Uses the prebuilt [[https://hub.docker.com/r/kozea/wdb][wdb docker image]]
+- To keep things simple, use port-forwarding instead of setting up an ingress
